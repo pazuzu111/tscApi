@@ -3,8 +3,6 @@ import * as bodyParser from 'body-parser';
 import { Server } from '@overnightjs/core';
 import cors = require('cors')
 
-
-
 export default class ServerIndex extends Server {
     constructor() {
         super()
