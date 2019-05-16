@@ -16,6 +16,7 @@ export default class leadsController {
     }
     
     //get all leads at route => '/leads'
+    @OnUndefined(404)
     @Get('/leads')
     public getLeads(@Req() request: Request, @Res() response: Response): any {
         return response.json(this.leadsList);
@@ -36,9 +37,6 @@ export default class leadsController {
             return response.status(400).json({error: "all fields must be populated"})    
             throw new Error() 
         }
-
-        //check if contact already exist
-        // this.contactList.forEach((x: any, index: any) => console.log(x[index]))
        
         for(var key in this.contactList) {
             if(this.contactList[key].contact.email == lead.email) {
@@ -49,9 +47,9 @@ export default class leadsController {
 
         //if contact does not exist create contact
         if(!contactId) {
-            console.log('contactID: false - create', contactId)
             contactId = uuidv1()
-                //mock contact schema
+            
+            //mock contact schema
             let contact = {
                 id: contactId,
                 first_name: lead.name,
@@ -74,8 +72,6 @@ export default class leadsController {
             return response.status(201).send(lead) 
         }
         else {  
-            console.log('contactID:', contactId)
-
 
             //mock db automated properties
             lead.contact_id = contactId   
@@ -87,5 +83,11 @@ export default class leadsController {
 
             return response.status(201).send(lead) 
         }
+    }
+
+    @OnUndefined(404)
+    @Get('/contacts')
+    public getContacts(@Req() request: Request, @Res() response: Response): any {
+        return response.json(this.contactList);
     }
 }
