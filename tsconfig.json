@@ -2,6 +2,7 @@
     "compileOnSave": true,
     "compilerOptions": {
       "module": "commonjs",
+      "resolveJsonModule": true,
       "strict": true,
       "baseUrl": "./",
       "outDir": "build",
@@ -30,6 +31,6 @@
     "exclude": [
       "./**/*.test.ts",
       "./public/",
-      "/node_modules/"
+      "node_modules"
     ]
   }
