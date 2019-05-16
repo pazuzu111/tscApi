@@ -4,7 +4,7 @@ import {Request, Response, response} from "express";
 import uuidv1 = require('uuid/v1');
 import { verifyInput } from '../utils/verifyInput'
 
-@JsonController('/api')
+@JsonController('/api/contacts')
 export default class contactsController {
     contactList: any
 
@@ -13,30 +13,28 @@ export default class contactsController {
     }
 
     @OnUndefined(404)
-    @Get('/contacts')
+    @Get()
     public getContacts(@Req() request: Request, @Res() response: Response): any {
         return response.json(this.contactList);
     }
 
-    @Post('/contacts')
+    @Post()
     public createContact(@Body() body: any, @Res() response: Response): any {
         let contactId: any
         let verify: any
         let contactBody = body
         let user: boolean = false
 
-         //verify input fields
-         verify = verifyInput(contactBody)
+        //verify input fields
+        verify = verifyInput(contactBody)
 
          if(!verify) { 
-             return response.status(400).json({error: "all fields must be populated"})    
+            return response.status(400).json({error: "all fields must be populated"})    
          }
         
          //check for existing user
         for(var key in this.contactList) {
-            if(this.contactList[key].contact.email === contactBody.email) {
-                user = true
-            }
+            if(this.contactList[key].contact.email === contactBody.email) { user = true }
         }  
 
         //if user does not exist create one
@@ -61,8 +59,6 @@ export default class contactsController {
             
             return response.status(201).send(contact)  
         }
-        else {
-            return response.status(400).send({error: "user already exists"})    
-        }
+        else { return response.status(400).send({error: "user already exists"}) }
     }
 }
