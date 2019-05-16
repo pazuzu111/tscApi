@@ -10,9 +10,6 @@ const app = createExpressServer({
     controllers: [leadsController] // we specify controllers we want to use
 });
 
-//middleware
-app.use(cors())
-
 app.listen(port, () => {
     console.log('fired')
 })

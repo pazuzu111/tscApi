@@ -16,7 +16,7 @@ export default class leadsController {
     }
     
     //get all leads at route => '/leads'
-    @OnUndefined(404)
+    // @OnUndefined(404)
     @Get('/leads')
     public getLeads(@Req() request: Request, @Res() response: Response): any {
         return response.json(this.leadsList);
@@ -24,7 +24,7 @@ export default class leadsController {
     
     //create a lead & associated contact at route => '/leads'
     @Post('/leads')
-    @OnUndefined(400)
+    // @OnUndefined(400)
     private async createLead(@Body() body: any, @Res() response: Response) {
         let contactId: any
         let verify: boolean
@@ -52,7 +52,7 @@ export default class leadsController {
             //mock contact schema
             let contact = {
                 id: contactId,
-                first_name: lead.name,
+                first_name: lead.first_name,
                 last_name: lead.last_name,
                 email: lead.email,
                 phone: lead.phone,
@@ -85,9 +85,54 @@ export default class leadsController {
         }
     }
 
-    @OnUndefined(404)
+    // @OnUndefined(404)
     @Get('/contacts')
     public getContacts(@Req() request: Request, @Res() response: Response): any {
         return response.json(this.contactList);
+    }
+
+    // @OnUndefined(400)
+    @Post('/contacts')
+    public createContact(@Body() body: any, @Res() response: Response): any {
+        let contactId: any
+        let verify: any
+        let contactBody = body
+        let user: boolean = false
+
+         //verify input fields
+         verify = verifyLead(contactBody)
+
+         if(!verify) { 
+             return response.status(400).json({error: "all fields must be populated"})    
+         }
+        
+        for(var key in this.contactList) {
+            if(this.contactList[key].contact.email === contactBody.email) {
+                user = true
+            }
+        }  
+
+        if(!user) {
+            console.log("creating contact...", contactBody.email)
+
+            contactId = uuidv1()
+            
+            //mock contact schema
+            let contact = {
+                id: contactId,
+                first_name: contactBody.first_name,
+                last_name: contactBody.last_name,
+                email: contactBody.email,
+                phone: contactBody.phone,
+                created_at : new Date(),    
+                updated_at : new Date()  
+            }
+
+            this.contactList.push({contact})
+            return response.status(201).send(contact)  
+        }
+        else {
+            return response.status(400).json({error: "user already exists"})    
+        }
     }
 }
