@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "watch-ts": "tsc -w",
-    "watch-node": "nodemon build/ServerIndex.js",
+    "watch-node": "nodemon build/server.js",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript, Node\" -c \"yello.bold, cyan.bold\" \"yarn run watch-ts\" \"yarn run watch-node\""
   },
   "license": "MIT",

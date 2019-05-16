@@ -3,7 +3,7 @@ import * as leadsData from '../data/leads.json';
 import * as contactData from '../data/contacts.json';
 import {Request, Response, response} from "express";
 import uuidv1 = require('uuid/v1');
-import { verifyLead } from '../utils/verifyLeadFields'
+import { verifyInput } from '../utils/verifyInput'
 
 @JsonController('/api')
 export default class leadsController {
@@ -16,7 +16,7 @@ export default class leadsController {
     }
     
     //get all leads at route => '/leads'
-    // @OnUndefined(404)
+    @OnUndefined(404)
     @Get('/leads')
     public getLeads(@Req() request: Request, @Res() response: Response): any {
         return response.json(this.leadsList);
@@ -24,24 +24,23 @@ export default class leadsController {
     
     //create a lead & associated contact at route => '/leads'
     @Post('/leads')
-    // @OnUndefined(400)
     private async createLead(@Body() body: any, @Res() response: Response) {
         let contactId: any
         let verify: boolean
         let lead = body
         
         //verify input fields
-        verify = verifyLead(lead)
+        verify = verifyInput(lead)
 
         if(!verify) { 
             return response.status(400).json({error: "all fields must be populated"})    
             throw new Error() 
         }
        
+        //check for existing user
         for(var key in this.contactList) {
             if(this.contactList[key].contact.email == lead.email) {
                 contactId = this.contactList[key].contact.id
-                console.log('email: ', contactId)
             }
         }
 
@@ -85,13 +84,12 @@ export default class leadsController {
         }
     }
 
-    // @OnUndefined(404)
+    @OnUndefined(404)
     @Get('/contacts')
     public getContacts(@Req() request: Request, @Res() response: Response): any {
         return response.json(this.contactList);
     }
 
-    // @OnUndefined(400)
     @Post('/contacts')
     public createContact(@Body() body: any, @Res() response: Response): any {
         let contactId: any
@@ -100,21 +98,23 @@ export default class leadsController {
         let user: boolean = false
 
          //verify input fields
-         verify = verifyLead(contactBody)
+         verify = verifyInput(contactBody)
 
          if(!verify) { 
              return response.status(400).json({error: "all fields must be populated"})    
          }
         
+         //check for existing user
         for(var key in this.contactList) {
             if(this.contactList[key].contact.email === contactBody.email) {
                 user = true
             }
         }  
 
+        //if user does not exist create one
         if(!user) {
-            console.log("creating contact...", contactBody.email)
 
+            //generate unique id
             contactId = uuidv1()
             
             //mock contact schema
@@ -128,11 +128,13 @@ export default class leadsController {
                 updated_at : new Date()  
             }
 
+            //save data
             this.contactList.push({contact})
+            
             return response.status(201).send(contact)  
         }
         else {
-            return response.status(400).json({error: "user already exists"})    
+            return response.status(400).send({error: "user already exists"})    
         }
     }
 }
